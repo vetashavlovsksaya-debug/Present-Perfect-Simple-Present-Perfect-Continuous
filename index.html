@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unit 4 — Present Perfect Trainer</title>
+  <style>
+    :root{
+      --bg:#f7fbfd;
+      --panel:#ffffff;
+      --panel-soft:#eef8fb;
+      --text:#17324d;
+      --muted:#667a8e;
+      --border:#cfe3ed;
+      --accent:#2f8eb0;
+      --accent-dark:#246f8c;
+      --accent-soft:#dff2f8;
+      --good:#2f7d4a;
+      --good-bg:#eef8f1;
+      --bad:#a13f3f;
+      --bad-bg:#fff1f1;
+      --warn:#8b651b;
+      --warn-bg:#fff8e7;
+      --shadow:0 12px 34px rgba(23,50,77,.08);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(180deg,#fbfeff 0%,#eef7fb 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    .page{
+      width:min(980px,calc(100% - 28px));
+      margin:28px auto 48px;
+    }
+
+    .hero,.panel,.results{
+      background:var(--panel);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+    }
+
+    .hero{
+      border-radius:24px;
+      padding:26px;
+      margin-bottom:18px;
+    }
+
+    .eyebrow{
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-size:12px;
+      font-weight:900;
+      color:var(--accent-dark);
+      margin-bottom:7px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(28px,5vw,46px);
+      line-height:1.06;
+    }
+
+    .subtitle{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .mode-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    button{font:inherit;cursor:pointer}
+
+    .mode-btn,.btn{
+      min-height:46px;
+      border-radius:13px;
+      border:1px solid var(--border);
+      padding:10px 16px;
+      font-weight:850;
+      background:#fff;
+      color:var(--text);
+    }
+
+    .mode-btn.active{
+      background:var(--accent-soft);
+      border-color:var(--accent);
+      color:var(--accent-dark);
+    }
+
+    .primary{
+      background:var(--accent);
+      border-color:var(--accent);
+      color:#fff;
+    }
+
+    .primary:hover{background:var(--accent-dark)}
+
+    .info{
+      background:var(--panel-soft);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px 16px;
+      margin-bottom:14px;
+      line-height:1.55;
+      color:var(--muted);
+    }
+
+    .info strong{color:var(--text)}
+
+    .progress-wrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:14px 4px;
+    }
+
+    .track{
+      flex:1;
+      height:10px;
+      background:#dcebf2;
+      border:1px solid var(--border);
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .bar{
+      height:100%;
+      width:0%;
+      background:var(--accent);
+      transition:width .25s ease;
+    }
+
+    .progress-text{
+      white-space:nowrap;
+      font-size:14px;
+      font-weight:850;
+    }
+
+    .panel,.results{
+      border-radius:20px;
+      padding:22px;
+    }
+
+    .topline{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      background:var(--panel-soft);
+      border:1px solid var(--border);
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .point{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:750;
+    }
+
+    .instruction{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:8px;
+    }
+
+    .question{
+      white-space:pre-line;
+      font-size:clamp(19px,3vw,25px);
+      font-weight:850;
+      line-height:1.48;
+      margin-bottom:18px;
+    }
+
+    .answers{
+      display:grid;
+      gap:10px;
+    }
+
+    .option{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      border:1px solid var(--border);
+      border-radius:13px;
+      padding:12px;
+      background:#fff;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .option:hover{
+      border-color:var(--accent);
+      background:#fbfeff;
+    }
+
+    .option:has(input:checked),
+    .option.selected{
+      border-color:var(--accent);
+      background:var(--accent-soft);
+    }
+
+    .option input{
+      margin-top:3px;
+      accent-color:var(--accent);
+      transform:scale(1.12);
+    }
+
+    .text-answer{
+      width:100%;
+      min-height:49px;
+      border:1px solid var(--border);
+      border-radius:13px;
+      padding:11px 13px;
+      background:var(--panel-soft);
+      color:var(--text);
+      font-size:16px;
+      outline:none;
+    }
+
+    .text-answer:focus,
+    button:focus-visible{
+      outline:2px solid var(--accent);
+      outline-offset:2px;
+    }
+
+    .hint,.feedback{
+      margin-top:14px;
+      border-radius:14px;
+      padding:14px 16px;
+      line-height:1.55;
+    }
+
+    .hint{
+      background:var(--warn-bg);
+      border:1px solid #e9d89e;
+      color:var(--warn);
+    }
+
+    .feedback.good{
+      background:var(--good-bg);
+      border:1px solid #b8dfc5;
+      color:var(--good);
+    }
+
+    .feedback.bad{
+      background:var(--bad-bg);
+      border:1px solid #ecc6c6;
+      color:var(--bad);
+    }
+
+    .feedback.neutral{
+      background:var(--panel-soft);
+      border:1px solid var(--border);
+      color:var(--text);
+    }
+
+    .actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .hidden{display:none!important}
+
+    .score{
+      font-size:clamp(40px,8vw,66px);
+      font-weight:950;
+      color:var(--accent-dark);
+      margin:8px 0;
+    }
+
+    .review-list{
+      display:grid;
+      gap:9px;
+      margin-top:16px;
+    }
+
+    .review-item{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:13px;
+      padding:12px;
+    }
+
+    .footer{
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      margin-top:18px;
+    }
+
+    @media(max-width:640px){
+      .page{width:min(100% - 18px,980px);margin-top:12px}
+      .hero,.panel,.results{padding:18px}
+      .mode-grid{grid-template-columns:1fr}
+      .actions .btn{width:100%}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">Destination B1 · Unit 4</div>
+      <h1>Present Perfect Simple · Present Perfect Continuous</h1>
+      <p class="subtitle">Result vs duration · for / since · just / already / yet · ever / never · unfinished situations</p>
+    </section>
+
+    <div class="mode-grid" role="group" aria-label="Choose training mode">
+      <button id="practiceTab" class="mode-btn active" type="button">Practice Mode</button>
+      <button id="examTab" class="mode-btn" type="button">Exam Mode</button>
+    </div>
+
+    <div id="modeInfo" class="info"></div>
+
+    <div class="progress-wrap">
+      <div class="track"><div id="bar" class="bar"></div></div>
+      <div id="progress" class="progress-text"></div>
+    </div>
+
+    <section id="questionCard" class="panel">
+      <div class="topline">
+        <span id="cat" class="chip"></span>
+        <span class="point">1 point</span>
+      </div>
+
+      <div id="instruction" class="instruction"></div>
+      <div id="question" class="question"></div>
+
+      <form id="form" class="answers"></form>
+
+      <div id="hint" class="hint hidden"></div>
+      <div id="feedback" class="feedback hidden" aria-live="polite"></div>
+
+      <div class="actions">
+        <button id="hintBtn" class="btn" type="button">Hint</button>
+        <button id="checkBtn" class="btn primary" type="button">Check answer</button>
+        <button id="nextBtn" class="btn hidden" type="button">Next →</button>
+        <button id="resetBtn" class="btn" type="button">Restart</button>
+      </div>
+    </section>
+
+    <section id="results" class="results hidden" aria-live="polite"></section>
+
+    <div class="footer">Learn · Practise · Progress</div>
+  </main>
+
+  <script>
+  (() => {
+    const practice = [
+      {
+        t:'mc', c:'Present Perfect Simple', i:'Choose the correct answer.',
+        q:'I can’t open the document because I ___ the wrong file.',
+        o:['have uploaded','have been uploading','uploaded yesterday'], a:0,
+        h:'The important thing is the result now.',
+        e:'Use Present Perfect Simple when the present result matters: “have uploaded the wrong file”.'
+      },
+      {
+        t:'mc', c:'Present Perfect Continuous', i:'Choose the correct answer.',
+        q:'Why are your eyes tired? I ___ at a screen all afternoon.',
+        o:['have looked','have been looking','looked'], a:1,
+        h:'Think about duration and the activity that has been continuing.',
+        e:'Present Perfect Continuous fits ongoing activity and visible result: “have been looking”.'
+      },
+      {
+        t:'mc', c:'Simple or Continuous', i:'Choose the best answer.',
+        q:'We ___ three posters for the school project so far.',
+        o:['have designed','have been designing','are designing since Monday'], a:0,
+        h:'You know the number of finished posters.',
+        e:'Use Present Perfect Simple when the focus is on completed quantity: “have designed three posters”.'
+      },
+      {
+        t:'mc', c:'Simple or Continuous', i:'Choose the best answer.',
+        q:'We ___ the school project all week, so everyone is a bit tired.',
+        o:['have finished','have been doing','did'], a:1,
+        h:'Focus on the ongoing effort, not the finished result.',
+        e:'Present Perfect Continuous works well with “all week”.'
+      },
+      {
+        t:'input', c:'Open task', i:'Complete with the correct form of WRITE.',
+        q:'Mia __________ emails since breakfast and she still hasn’t finished.',
+        ans:['has been writing'], show:'has been writing',
+        h:'The action started earlier and is still continuing.',
+        e:'Use Present Perfect Continuous for an unfinished activity over a period of time.'
+      },
+      {
+        t:'input', c:'Open task', i:'Complete with the correct form of LOSE.',
+        q:'Oh no! I __________ my bus card.',
+        ans:['have lost'], show:'have lost',
+        h:'The speaker cannot use it now.',
+        e:'Present Perfect Simple shows a completed action with a present result.'
+      },
+      {
+        t:'mc', c:'just / already / yet', i:'Choose the correct answer.',
+        q:'Dad isn’t here. He has ___ gone to the shop.',
+        o:['just','yet','since'], a:0,
+        h:'This means a very short time ago.',
+        e:'“Just” means a moment ago.'
+      },
+      {
+        t:'mc', c:'just / already / yet', i:'Choose the correct answer.',
+        q:'Have you tidied your room ___?',
+        o:['already','yet','for'], a:1,
+        h:'This is a question.',
+        e:'Use “yet” in questions and negatives.'
+      },
+      {
+        t:'mc', c:'ever / never', i:'Choose the correct answer.',
+        q:'This is the most interesting film I have ___ seen.',
+        o:['ever','never','yet'], a:0,
+        h:'The structure is “the most … I have ever …”.',
+        e:'We usually say “I have ever seen”.'
+      },
+      {
+        t:'input', c:'for / since', i:'Complete with one word.',
+        q:'I’ve known Olivia __________ 2021.',
+        ans:['since'], show:'since',
+        h:'Use this word before a starting point.',
+        e:'Since + point in time.'
+      },
+      {
+        t:'input', c:'for / since', i:'Complete with one word.',
+        q:'We’ve lived here __________ six months.',
+        ans:['for'], show:'for',
+        h:'Use this word before a period of time.',
+        e:'For + length of time.'
+      },
+      {
+        t:'mc', c:'Stative verbs', i:'Choose the correct answer.',
+        q:'I ___ Mr Harris for years. He used to teach my sister too.',
+        o:['have known','have been knowing','know since'], a:0,
+        h:'“Know” is normally not used in continuous forms here.',
+        e:'Use Present Perfect Simple with stative verbs like “know”.'
+      },
+      {
+        t:'input', c:'Translation', i:'Translate the fragment in brackets.',
+        q:'I’m tired because (uczę się od dwóch godzin) __________.',
+        ans:['i have been studying for two hours','i have been learning for two hours'], show:'I have been studying for two hours',
+        h:'Focus on duration and present effect.',
+        e:'Present Perfect Continuous is the natural choice here.'
+      },
+      {
+        t:'input', c:'Translation', i:'Translate the fragment in brackets.',
+        q:'This is the first time (jadłem ramen) __________.',
+        ans:['i have eaten ramen','i have tried ramen'], show:'I have eaten ramen / I have tried ramen',
+        h:'After “It’s the first time…”, use Present Perfect.',
+        e:'The usual structure is “It’s the first time I have …”.'
+      },
+      {
+        t:'mc', c:'Language in context', i:'Choose the best response.',
+        q:'— Why is the table covered in flour?\n— ___',
+        o:['I’ve baked three cakes yesterday.','I’ve been baking.','I’m baking since morning.'], a:1,
+        h:'The speaker explains the visible result now.',
+        e:'“I’ve been baking” explains the mess and ongoing activity.'
+      },
+      {
+        t:'mc', c:'Language in context', i:'Choose the best response.',
+        q:'— Can you lend me that magazine?\n— Sorry, ___',
+        o:['I haven’t finished it yet.','I didn’t finish it already.','I haven’t been finishing it yet.'], a:0,
+        h:'The person still needs it.',
+        e:'Use Present Perfect Simple negative with “yet”.'
+      },
+      {
+        t:'input', c:'Sentence transformation', i:'Complete the second sentence.',
+        q:'I started wearing glasses in Year 5.\nI __________ glasses since Year 5.',
+        ans:['have worn','have been wearing'], show:'have worn / have been wearing',
+        h:'Both forms are natural here.',
+        e:'Both “have worn” and “have been wearing” are acceptable in this context.'
+      },
+      {
+        t:'input', c:'Sentence transformation', i:'Complete the second sentence.',
+        q:'This is my first time visiting Prague.\nI __________ Prague before.',
+        ans:["have never visited","haven't visited","have not visited"], show:"have never visited / haven't visited",
+        h:'You are talking about life experience up to now.',
+        e:'The meaning is that the person has no earlier experience of visiting Prague.'
+      },
+      {
+        t:'mc', c:'Meaning & grammar', i:'Choose the sentence that best explains the situation.',
+        q:'Which sentence suggests the activity is still continuing now?',
+        o:['She has written her essay.','She has been writing her essay.','She wrote her essay yesterday.'], a:1,
+        h:'Look for the form that focuses on duration and process.',
+        e:'Present Perfect Continuous often suggests the activity is ongoing or has only recently stopped.'
+      },
+      {
+        t:'input', c:'Error correction', i:'Correct the sentence.',
+        q:'How long are you knowing Mia?',
+        ans:['how long have you known mia'], show:'How long have you known Mia?',
+        h:'You need Present Perfect, not Present Continuous.',
+        e:'With “know”, use “have known”.'
+      },
+      {
+        t:'input', c:'Error correction', i:'Correct the sentence.',
+        q:'I have been finishing my project already.',
+        ans:['i have already finished my project','i have finished my project already'], show:'I have already finished my project.',
+        h:'The sentence is about a completed result.',
+        e:'Use Present Perfect Simple with “already” when the task is complete.'
+      },
+      {
+        t:'mc', c:'Reading & inference', i:'Choose the best answer.',
+        q:'A student says, “I’ve been revising all day and I’ve done four practice tests.” What does this show?',
+        o:[
+          'The student wants to describe only a past event with a finished time.',
+          'The student is showing both the activity over time and the result achieved.',
+          'The student has not revised at all.'
+        ], a:1,
+        h:'One form shows process; the other shows completed quantity.',
+        e:'This is a good example of using both forms together for different meanings.'
+      }
+    ];
+
+    const exam = [
+      {
+        t:'mc', c:'Grammar in context', i:'Choose the correct answer.',
+        q:'My sister ___ the same podcast every morning this week.',
+        o:['has listened to','has been listening to','listened to'], a:1
+      },
+      {
+        t:'mc', c:'Grammar in context', i:'Choose the correct answer.',
+        q:'We ___ all the tickets for the school show already.',
+        o:['have sold','have been selling','sell'], a:0
+      },
+      {
+        t:'mc', c:'Grammar in context', i:'Choose the correct answer.',
+        q:'This is the nicest café I have ___ visited.',
+        o:['never','ever','yet'], a:1
+      },
+      {
+        t:'input', c:'Open task', i:'Complete with the correct form of NOT DO.',
+        q:'I __________ my science homework yet.',
+        ans:["haven't done","have not done"], show:"haven't done"
+      },
+      {
+        t:'input', c:'Open task', i:'Complete with the correct form of RAIN.',
+        q:'It __________ since lunchtime, so the pitch is too wet to play on.',
+        ans:['has been raining'], show:'has been raining'
+      },
+      {
+        t:'input', c:'for / since', i:'Complete with one word.',
+        q:'We’ve been friends __________ primary school.',
+        ans:['since'], show:'since'
+      },
+      {
+        t:'input', c:'for / since', i:'Complete with one word.',
+        q:'My dad has worked here __________ ten years.',
+        ans:['for'], show:'for'
+      },
+      {
+        t:'mc', c:'Language in context', i:'Choose the best answer.',
+        q:'— Why are you out of breath?\n— ___',
+        o:['I’ve run five kilometres yesterday.','I’ve been running.','I run since six o’clock.'], a:1
+      },
+      {
+        t:'mc', c:'Language in context', i:'Choose the best answer.',
+        q:'— Have you ever tried rock climbing?\n— ___',
+        o:['No, I’ve never tried it.','No, I didn’t try it yet.','No, I’m never trying it.'], a:0
+      },
+      {
+        t:'input', c:'Translation', i:'Translate the fragment.',
+        q:'Tom (właśnie wrócił do domu) __________.',
+        ans:['has just come home','has just got home','has just returned home'], show:'has just come home / has just got home'
+      },
+      {
+        t:'input', c:'Translation', i:'Translate the fragment.',
+        q:'How long (mieszkasz tutaj) __________?',
+        ans:['have you lived here','have you been living here'], show:'have you lived here / have you been living here'
+      },
+      {
+        t:'mc', c:'Sentence meaning', i:'Choose the best answer.',
+        q:'Which sentence focuses on the result, not the activity?',
+        o:['I’ve been cleaning the windows.','I’ve cleaned the windows.','I was cleaning the windows.'], a:1
+      },
+      {
+        t:'input', c:'Error correction', i:'Correct the sentence.',
+        q:'She has been here since two hours.',
+        ans:['she has been here for two hours'], show:'She has been here for two hours.'
+      },
+      {
+        t:'input', c:'Error correction', i:'Correct the sentence.',
+        q:'Did you ever ride a horse?',
+        ans:['have you ever ridden a horse'], show:'Have you ever ridden a horse?'
+      },
+      {
+        t:'input', c:'Open task', i:'Complete naturally. More than one answer is accepted.',
+        q:'I’ve been learning English for years, and recently I __________.',
+        ans:[
+          'have become more confident',
+          'have started speaking more',
+          'have started understanding more',
+          'have improved a lot',
+          'have felt more confident',
+          'have started enjoying it more',
+          'have made a lot of progress'
+        ],
+        show:'have become more confident / have improved a lot / etc.'
+      }
+    ];
+
+    const practiceTab=document.getElementById('practiceTab');
+    const examTab=document.getElementById('examTab');
+    const modeInfo=document.getElementById('modeInfo');
+    const bar=document.getElementById('bar');
+    const progress=document.getElementById('progress');
+    const cat=document.getElementById('cat');
+    const instruction=document.getElementById('instruction');
+    const question=document.getElementById('question');
+    const form=document.getElementById('form');
+    const hint=document.getElementById('hint');
+    const feedback=document.getElementById('feedback');
+    const hintBtn=document.getElementById('hintBtn');
+    const checkBtn=document.getElementById('checkBtn');
+    const nextBtn=document.getElementById('nextBtn');
+    const resetBtn=document.getElementById('resetBtn');
+    const questionCard=document.getElementById('questionCard');
+    const results=document.getElementById('results');
+
+    let mode='practice';
+    let index=0;
+    let score=0;
+    let locked=false;
+    let examAnswers=[];
+
+    const bank=()=>mode==='practice'?practice:exam;
+
+    const normalize=value=>String(value||'')
+      .toLowerCase()
+      .trim()
+      .replace(/[’‘]/g,"'")
+      .replace(/[.,!?;:]+$/,'')
+      .replace(/\s+/g,' ');
+
+    function setMode(newMode){
+      mode=newMode;
+      index=0;
+      score=0;
+      locked=false;
+      examAnswers=[];
+
+      practiceTab.classList.toggle('active',mode==='practice');
+      examTab.classList.toggle('active',mode==='exam');
+
+      results.classList.add('hidden');
+      questionCard.classList.remove('hidden');
+
+      modeInfo.innerHTML=mode==='practice'
+        ? '<strong>Practice Mode</strong><br>22 new questions · hints · instant checking · explanations · several natural answers accepted where appropriate.'
+        : '<strong>Exam Mode</strong><br>15 mixed questions · no hints · no feedback until the end.';
+
+      render();
+    }
+
+    function render(){
+      const b=bank();
+      const q=b[index];
+      locked=false;
+
+      progress.textContent=(index+1)+' / '+b.length;
+      bar.style.width=((index/b.length)*100)+'%';
+
+      cat.textContent=q.c;
+      instruction.textContent=q.i;
+      question.textContent=q.q;
+
+      hint.classList.add('hidden');
+      feedback.classList.add('hidden');
+      hint.innerHTML='';
+      feedback.innerHTML='';
+
+      hintBtn.classList.toggle('hidden',mode==='exam');
+      nextBtn.classList.add('hidden');
+      checkBtn.classList.remove('hidden');
+
+      checkBtn.textContent=mode==='practice'
+        ? 'Check answer'
+        : (index===b.length-1?'Finish exam':'Save & next');
+
+      form.innerHTML='';
+
+      if(q.t==='mc'){
+        q.o.forEach((optionText,i)=>{
+          const label=document.createElement('label');
+          label.className='option';
+
+          const radio=document.createElement('input');
+          radio.type='radio';
+          radio.name='answer';
+          radio.value=String(i);
+
+          radio.addEventListener('change',()=>{
+            form.querySelectorAll('.option').forEach(el=>el.classList.remove('selected'));
+            label.classList.add('selected');
+          });
+
+          const span=document.createElement('span');
+          span.textContent=String.fromCharCode(65+i)+'. '+optionText;
+
+          label.append(radio,span);
+          form.appendChild(label);
+        });
+      } else {
+        const input=document.createElement('input');
+        input.type='text';
+        input.id='textAnswer';
+        input.className='text-answer';
+        input.autocomplete='off';
+        input.placeholder='Type your answer…';
+        input.setAttribute('aria-label','Your answer');
+        form.appendChild(input);
+      }
+    }
+
+    function getAnswer(q){
+      if(q.t==='mc'){
+        const selected=form.querySelector('input[name="answer"]:checked');
+        return selected?Number(selected.value):null;
+      }
+      return document.getElementById('textAnswer')?.value || '';
+    }
+
+    function isCorrect(q,answer){
+      if(q.t==='mc') return answer===q.a;
+      return q.ans.some(item=>normalize(item)===normalize(answer));
+    }
+
+    function correctDisplay(q){
+      return q.t==='mc'?q.o[q.a]:q.show;
+    }
+
+    hintBtn.addEventListener('click',()=>{
+      const q=bank()[index];
+      hint.innerHTML='<strong>Hint:</strong> '+q.h;
+      hint.classList.remove('hidden');
+    });
+
+    checkBtn.addEventListener('click',()=>{
+      const q=bank()[index];
+      const answer=getAnswer(q);
+
+      if(answer===null || (q.t==='input' && !String(answer).trim())){
+        feedback.className='feedback neutral';
+        feedback.textContent='Choose or type an answer first.';
+        feedback.classList.remove('hidden');
+        return;
+      }
+
+      if(mode==='practice'){
+        if(locked) return;
+        locked=true;
+
+        const ok=isCorrect(q,answer);
+        if(ok) score++;
+
+        feedback.className=ok?'feedback good':'feedback bad';
+        feedback.innerHTML=ok
+          ? '<strong>✓ Correct</strong><br>'+q.e
+          : '<strong>Not quite.</strong><br>Possible answer: <strong>'+correctDisplay(q)+'</strong><br><br>'+q.e;
+
+        checkBtn.classList.add('hidden');
+        nextBtn.classList.remove('hidden');
+      } else {
+        examAnswers[index]=answer;
+        if(index<bank().length-1){
+          index++;
+          render();
+        } else {
+          finishExam();
+        }
+      }
+    });
+
+    nextBtn.addEventListener('click',()=>{
+      if(index<practice.length-1){
+        index++;
+        render();
+      } else {
+        finishPractice();
+      }
+    });
+
+    function finishPractice(){
+      const total=practice.length;
+      const pct=Math.round((score/total)*100);
+
+      bar.style.width='100%';
+      questionCard.classList.add('hidden');
+      results.classList.remove('hidden');
+
+      results.innerHTML=
+        '<h2>Practice complete</h2>'+
+        '<div class="score">'+score+' / '+total+'</div>'+
+        '<p><strong>'+pct+'%</strong> correct.</p>'+
+        '<p>Pay special attention to the difference between result and duration. Also remember that some verbs like <em>know</em> usually prefer Present Perfect Simple, not Continuous.</p>'+
+        '<div class="actions">'+
+          '<button id="againPractice" class="btn primary" type="button">Practise again</button>'+
+          '<button id="goExam" class="btn" type="button">Try Exam Mode</button>'+
+        '</div>';
+
+      document.getElementById('againPractice').addEventListener('click',()=>setMode('practice'));
+      document.getElementById('goExam').addEventListener('click',()=>setMode('exam'));
+    }
+
+    function finishExam(){
+      let examScore=0;
+      const rows=[];
+
+      exam.forEach((q,i)=>{
+        const ok=isCorrect(q,examAnswers[i]);
+        if(ok) examScore++;
+        rows.push({q,i,ok});
+      });
+
+      const pct=Math.round((examScore/exam.length)*100);
+
+      let message=
+        pct>=85 ? 'Excellent control of Unit 4.' :
+        pct>=70 ? 'Good result. Review a few tense contrasts and time markers.' :
+        pct>=50 ? 'You understand the basics, but some forms still need active practice.' :
+        'Return to Practice Mode and work through the explanations first.';
+
+      bar.style.width='100%';
+      questionCard.classList.add('hidden');
+      results.classList.remove('hidden');
+
+      let html=
+        '<h2>Exam result</h2>'+
+        '<div class="score">'+examScore+' / '+exam.length+'</div>'+
+        '<p><strong>'+pct+'%</strong> · '+message+'</p>'+
+        '<div class="review-list">';
+
+      rows.forEach(row=>{
+        html+=
+          '<div class="review-item">'+
+            '<strong>'+(row.i+1)+'. '+(row.ok?'✓ Correct':'✗ Review')+'</strong>'+
+            (row.ok?'':'<div style="margin-top:6px">Possible answer: <strong>'+correctDisplay(row.q)+'</strong></div>')+
+          '</div>';
+      });
+
+      html+=
+        '</div>'+
+        '<div class="actions">'+
+          '<button id="retryExam" class="btn primary" type="button">Try exam again</button>'+
+          '<button id="backPractice" class="btn" type="button">Practice Mode</button>'+
+        '</div>';
+
+      results.innerHTML=html;
+
+      document.getElementById('retryExam').addEventListener('click',()=>setMode('exam'));
+      document.getElementById('backPractice').addEventListener('click',()=>setMode('practice'));
+    }
+
+    practiceTab.addEventListener('click',()=>setMode('practice'));
+    examTab.addEventListener('click',()=>setMode('exam'));
+    resetBtn.addEventListener('click',()=>setMode(mode));
+
+    setMode('practice');
+  })();
+  </script>
+</body>
+</html>
